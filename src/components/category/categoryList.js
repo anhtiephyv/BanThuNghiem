@@ -1,23 +1,25 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CategoryCreate from './categoryCreate';
-import { actGetAllCategoryRequest,  actDeleteCategoryRequest } from '../../action/index';
+import { actGetAllCategoryRequest, actDeleteCategoryRequest } from '../../action/index';
 import Pagination from './../../ultils/Pagination';
 class CategoryList extends Component {
     constructor(props) {
         super(props);
-         // an example array of 150 items to be paged
-         var exampleItems = [...Array(150).keys()].map(i => ({ id: (i+1), name: 'Item ' + (i+1) }));
- 
-         this.state = {
-             exampleItems: exampleItems,
-             pageOfItems: []
-         };
-  
-         // bind function in constructor instead of render (https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md)
-         this.onChangePage = this.onChangePage.bind(this);
+        // an example array of 150 items to be paged
+        var exampleItems = [...Array(150).keys()].map(i => ({ id: (i + 1), name: 'Item ' + (i + 1) }));
+        
+        this.state = {
+            exampleItems: exampleItems,
+            pageOfItems: []
+        };
+
+        // bind function in constructor instead of render (https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md)
+        this.onPageChanged = this.onPageChanged.bind(this);
     };
-    onChangePage(pageOfItems) {
+    onPageChanged(pageOfItems) {
+        let Items = this.state.exampleItems;
+        debugger;
         // update state with new page of items
         // this.setState({ pageOfItems: pageOfItems });
     }
@@ -94,16 +96,16 @@ class CategoryList extends Component {
 
                                             </tbody>
                                         </table>
-                                     
+
                                     </div>
                                     {/* END DATA TABLE*/}
                                     <div>
-                                      <Pagination items={this.state.exampleItems} onChangePage={this.onChangePage} />
+                                        <Pagination totalRecords={243} pageLimit={20} pageNeighbours={1} onPageChanged={this.onPageChanged} />
 
-                                      </div>
+                                    </div>
 
                                 </div>
-                                
+
                             </div>
 
                         </div>
@@ -129,7 +131,7 @@ class CategoryList extends Component {
                         <td>{category.CategoryID}</td>
                         <td>{category.CategoryName}</td>
                         <td>{category.CategoryLevel}</td>
-                        <td>{category.ParentName}</td> 
+                        <td>{category.ParentName}</td>
                         <td>
                             <button className="btn btn-sm btn-primary" ><i className="fas fa-pencil-alt"></i></button>
                             <button className="btn  btn-sm btn-danger" onClick={() => this.DeleteCategories(category.CategoryID)}><i className="fas fa-trash"></i></button>
@@ -142,7 +144,7 @@ class CategoryList extends Component {
     }
     // Delete
     DeleteCategories(id) {
-       this.props.onDeleteCategory(id);
+        this.props.onDeleteCategory(id);
     }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
