@@ -6,29 +6,57 @@ import Pagination from './../../ultils/Pagination';
 class CategoryList extends Component {
     constructor(props) {
         super(props);
-        // an example array of 150 items to be paged
-        var exampleItems = [...Array(150).keys()].map(i => ({ id: (i + 1), name: 'Item ' + (i + 1) }));
-
         this.state = {
-            exampleItems: exampleItems,
-            pageOfItems: []
+            allCountries: [],
+            currentCountries: [],
+            currentPage: null,
+            totalPages: null,
+            params = {
+                page: this.state.currentPage == null ? 0 : this.state.currentPage,
+                pageSize: this.state.pageLimit == null ? 10 : this.state.pageLimit,
+                orderby: "CategoryID",
+                sortDir: "desc",
+                filter: null,
+                keyword: null,
+            }
         };
-
         // bind function in constructor instead of render (https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md)
         this.onPageChanged = this.onPageChanged.bind(this);
     };
-    onPageChanged(pageOfItems) {
-        let Items = this.state.exampleItems;
+    onPageChanged(data) {
         debugger;
         // update state with new page of items
         // this.setState({ pageOfItems: pageOfItems });
+
+        const { allCountries } = this.state;
+        const { currentPage, totalPages, pageLimit } = data;
+
+        const offset = (currentPage - 1) * pageLimit;
+        const currentCountries = allCountries.slice(offset, offset + pageLimit);
+
+        this.setState({ currentPage, currentCountries, totalPages });
     }
     componentDidMount() {
-        this.props.getAllCategories();
+        let params = {
+            page: this.state.currentPage == null ? 0 : this.state.currentPage,
+            pageSize: this.state.pageLimit == null ? 10 : this.state.pageLimit,
+            orderby: "CategoryID",
+            sortDir: "desc",
+            filter: null,
+            keyword: null,
+        };
+        this.props.getAllCategories(params);
     };
-    render() {
 
-        var { categories } = this.props;
+    render() {
+        const {
+            allCountries,
+            currentCountries,
+            currentPage,
+            totalPages
+        } = this.state;
+        var { categories, type } = this.props;
+        debugger;
         return (
             <div>
                 {/* MAIN CONTENT*/}
@@ -47,7 +75,7 @@ class CategoryList extends Component {
                                         </div>
                                         <div className="table-data__tool-right">
                                             <button className="au-btn au-btn-icon au-btn--green au-btn--small" data-toggle="modal" data-target="#largeModal">
-                                                <i className="zmdi zmdi-plus"></i>Thêm mới</button>
+                                                <i className="zmdi zmdi-plus"></i>Thêm mới {type}</button>
                                             <div className="rs-select2--dark rs-select2--sm rs-select2--dark2">
                                                 <select className="js-select2" name="type">
                                                     <option >Export</option>
@@ -83,7 +111,7 @@ class CategoryList extends Component {
                                     </div>
                                     {/* END DATA TABLE*/}
                                     <div>
-                                        <Pagination totalRecords={243} pageLimit={20} pageNeighbours={1} onPageChanged={this.onPageChanged} />
+                                        <Pagination totalRecords={243} pageLimit={1} pageNeighbours={1} onPageChanged={this.onPageChanged} />
 
                                     </div>
 
@@ -132,8 +160,9 @@ class CategoryList extends Component {
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
     return {
-        getAllCategories: () => {
-            dispatch(actGetAllCategoryRequest())
+        getAllCategories: (params) => {
+
+            dispatch(actGetAllCategoryRequest(params));
         },
         onDeleteCategory: (id) => {
             dispatch(actDeleteCategoryRequest(id))
@@ -141,6 +170,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     }
 }
 const mapStateToProps = state => {
+    debugger;
     return {
         categories: state.categories
     }

@@ -1,9 +1,9 @@
 import * as Types from '../constant/actionType';
-import callApi from './../ultils/apiCaller';
+import * as callApi from './../ultils/apiCaller';
 // Get danh sách
-export const actGetAllCategoryRequest = () => {
+export const actGetAllCategoryRequest = (params) => {
     return (dispatch) => {
-        callApi('Category/getall', 'GET', null).then(res => {
+        callApi.get('Category/getlistpaging', 'GET', params).then(res => {
             //     this.props.getAllCategories(res.data);
             dispatch(actGetAllCategory(res.data));
         })
@@ -12,7 +12,7 @@ export const actGetAllCategoryRequest = () => {
 export const actGetAllCategory = (categories) => {
     return {
         type: Types.GetAllCategories,
-        categories
+        categories:categories.Items,
     }
 }
 // Thêm 
