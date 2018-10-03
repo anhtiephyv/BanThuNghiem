@@ -8,7 +8,7 @@ class CategoryList extends Component {
         super(props);
         // an example array of 150 items to be paged
         var exampleItems = [...Array(150).keys()].map(i => ({ id: (i + 1), name: 'Item ' + (i + 1) }));
-        
+
         this.state = {
             exampleItems: exampleItems,
             pageOfItems: []
@@ -42,24 +42,8 @@ class CategoryList extends Component {
                                     <h3 className="title-5 m-b-35">Cú test</h3>
                                     <div className="table-data__tool">
                                         <div className="table-data__tool-left">
-                                            <div className="rs-select2--light rs-select2--md">
-                                                <select className="js-select2" name="property">
-                                                    <option >All Properties</option>
-                                                    <option value="">Option 1</option>
-                                                    <option value="">Option 2</option>
-                                                </select>
-                                                <div className="dropDownSelect2"></div>
-                                            </div>
-                                            <div className="rs-select2--light rs-select2--sm">
-                                                <select className="js-select2" name="time">
-                                                    <option >Today</option>
-                                                    <option value="">3 Days</option>
-                                                    <option value="">1 Week</option>
-                                                </select>
-                                                <div className="dropDownSelect2"></div>
-                                            </div>
-                                            <button className="au-btn-filter">
-                                                <i className="zmdi zmdi-filter-list"></i>filters</button>
+                                            <input className="au-input au-input--xl" type="text" name="search" placeholder="Search for datas &amp; reports..." />
+                                            <button className="btn btn-primary" type="submit"><i className="zmdi zmdi-search"></i> Tìm kiếm</button>
                                         </div>
                                         <div className="table-data__tool-right">
                                             <button className="au-btn au-btn-icon au-btn--green au-btn--small" data-toggle="modal" data-target="#largeModal">
@@ -80,11 +64,10 @@ class CategoryList extends Component {
                                 <div className="col-md-12">
                                     {/* DATA TABLE*/}
                                     <div className="table-responsive table--no-card m-b-30">
-
-                                        <table className="table table-borderless table-striped table-earning">
+                                        <table className="table table-bordered  table-striped table-earning">
                                             <thead>
                                                 <tr>
-                                                    <th>Id</th>
+                                                    <th>Id <i className="fa fa-sort float-right" aria-hidden="true"></i></th>
                                                     <th>Tên</th>
                                                     <th>Level</th>
                                                     <th>Loại cha</th>
