@@ -3,40 +3,47 @@ import { connect } from 'react-redux';
 import CategoryCreate from './categoryCreate';
 import { actGetAllCategoryRequest, actDeleteCategoryRequest } from '../../action/index';
 import Pagination from './../../ultils/Pagination';
+import * as categoryservice from './../../service/category';
 class CategoryList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            allCountries: [],
-            currentCountries: [],
             currentPage: null,
-            totalPages: null,
-            params = {
-                page: this.state.currentPage == null ? 0 : this.state.currentPage,
-                pageSize: this.state.pageLimit == null ? 10 : this.state.pageLimit,
-                orderby: "CategoryID",
-                sortDir: "desc",
-                filter: null,
-                keyword: null,
-            }
+            totalPages: 0,
+            totalRecords: 0,
+            pageLimit: 5, keyword: null
         };
         // bind function in constructor instead of render (https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md)
         this.onPageChanged = this.onPageChanged.bind(this);
     };
     onPageChanged(data) {
-        debugger;
         // update state with new page of items
         // this.setState({ pageOfItems: pageOfItems });
-
-        const { allCountries } = this.state;
+        debugger;
+        if (data.currentPage > 0) {
+            data.currentPage = data.currentPage - 1;
+        }
         const { currentPage, totalPages, pageLimit } = data;
-
-        const offset = (currentPage - 1) * pageLimit;
-        const currentCountries = allCountries.slice(offset, offset + pageLimit);
-
-        this.setState({ currentPage, currentCountries, totalPages });
+        this.setState({ currentPage, totalPages, pageLimit }, () => {
+            this.reloadData();
+        })
+       
+    }
+    reloadData() {
+        categoryservice.getPaging({
+            page: this.state.currentPage == null ? 0 : this.state.currentPage,
+            pageSize: this.state.pageLimit == null ? 10 : this.state.pageLimit,
+            orderby: "CategoryID",
+            sortDir: "desc",
+            filter: null,
+            keyword: null,
+        }).then(res => {
+            this.setState({ totalRecords: res.data.TotalCount });
+            this.props.getAllCategories(res.data);
+        })
     }
     componentDidMount() {
+
         let params = {
             page: this.state.currentPage == null ? 0 : this.state.currentPage,
             pageSize: this.state.pageLimit == null ? 10 : this.state.pageLimit,
@@ -45,18 +52,21 @@ class CategoryList extends Component {
             filter: null,
             keyword: null,
         };
-        this.props.getAllCategories(params);
+        categoryservice.getPaging(params).then(res => {
+            this.setState({ totalRecords: res.data.TotalCount });
+            this.props.getAllCategories(res.data);
+        })
+
     };
 
     render() {
         const {
-            allCountries,
-            currentCountries,
             currentPage,
-            totalPages
+            totalPages,
+            totalRecords,
+            pageLimit
         } = this.state;
-        var { categories, type } = this.props;
-        debugger;
+        var { categories } = this.props;
         return (
             <div>
                 {/* MAIN CONTENT*/}
@@ -70,12 +80,12 @@ class CategoryList extends Component {
                                     <h3 className="title-5 m-b-35">Cú test</h3>
                                     <div className="table-data__tool">
                                         <div className="table-data__tool-left">
-                                            <input className="au-input au-input--xl" type="text" name="search" placeholder="Search for datas &amp; reports..." />
-                                            <button className="btn btn-primary" type="submit"><i className="zmdi zmdi-search"></i> Tìm kiếm</button>
+                                            <input className="au-input au-input--xl" type="text" name="keyword" placeholder="Search for datas &amp; reports..." />
+                                            <button onClick={e => this.reloadData()} className="btn btn-primary" type="submit"><i className="zmdi zmdi-search"></i> Tìm kiếm</button>
                                         </div>
                                         <div className="table-data__tool-right">
                                             <button className="au-btn au-btn-icon au-btn--green au-btn--small" data-toggle="modal" data-target="#largeModal">
-                                                <i className="zmdi zmdi-plus"></i>Thêm mới {type}</button>
+                                                <i className="zmdi zmdi-plus"></i>Thêm mới</button>
                                             <div className="rs-select2--dark rs-select2--sm rs-select2--dark2">
                                                 <select className="js-select2" name="type">
                                                     <option >Export</option>
@@ -111,8 +121,7 @@ class CategoryList extends Component {
                                     </div>
                                     {/* END DATA TABLE*/}
                                     <div>
-                                        <Pagination totalRecords={243} pageLimit={1} pageNeighbours={1} onPageChanged={this.onPageChanged} />
-
+                                        <Pagination totalRecords={this.state.totalRecords} pageLimit={pageLimit} pageNeighbours={1} onPageChanged={this.onPageChanged} />
                                     </div>
 
                                 </div>
@@ -133,6 +142,7 @@ class CategoryList extends Component {
     }
 
     // write function here
+
     showcategory(categories) {
         var result = null;
         if (categories != null && categories.length > 0) {
@@ -160,9 +170,8 @@ class CategoryList extends Component {
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
     return {
-        getAllCategories: (params) => {
-
-            dispatch(actGetAllCategoryRequest(params));
+        getAllCategories: (data) => {
+            dispatch(actGetAllCategoryRequest(data));
         },
         onDeleteCategory: (id) => {
             dispatch(actDeleteCategoryRequest(id))
@@ -170,7 +179,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     }
 }
 const mapStateToProps = state => {
-    debugger;
     return {
         categories: state.categories
     }
